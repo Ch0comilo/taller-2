@@ -37,11 +37,13 @@ jobs:
 
       - name: Dry-run pipeline
         run: |
-          python -c "
-            from src.orchestrator import PipelineOrchestrator
-            orchestrator = PipelineOrchestrator('config/pipeline_config.yaml')
-            print('Orchestrator inicializado correctamente')
-            "
+          # Use a here-doc to run multi-line Python without embedding it in a
+          # quoted -c string (avoids indentation/quoting issues).
+          python - <<'PY'
+          from src.orchestrator import PipelineOrchestrator
+          orchestrator = PipelineOrchestrator('config/pipeline_config.yaml')
+          print('Orchestrator inicializado correctamente')
+          PY
 
   integration-test:
     runs-on: ubuntu-latest
