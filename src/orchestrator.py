@@ -1,11 +1,10 @@
 import json
+import os
 import yaml
 import logging
 from datetime import datetime
-from src.data_validation import DataValidator
-from src.data_processing import DataProcessor
-from src.data_enrichment import DataEnricher
-from src.quality_checks import QualityChecker
+# Import pipeline components inside methods to allow tests to patch their
+# module-level classes (e.g. patch('src.data_validation.DataValidator')).
 
 
 class PipelineOrchestrator:
@@ -36,6 +35,12 @@ class PipelineOrchestrator:
         try:
             # 1. Validación de datos
             self.logger.info("Ejecutando validación de datos...")
+            # Import components here so tests can patch module-level classes
+            from src.data_validation import DataValidator
+            from src.data_processing import DataProcessor
+            from src.data_enrichment import DataEnricher
+            from src.quality_checks import QualityChecker
+
             validator = DataValidator(self.config['validation'])
             validation_result = validator.validate()
 
@@ -86,6 +91,7 @@ class PipelineOrchestrator:
         }
 
         # Guardar reporte
+        os.makedirs('data/outputs', exist_ok=True)
         with open(f'data/outputs/report_{execution_id}.json', 'w') as f:
             json.dump(report, f, indent=2)
 
